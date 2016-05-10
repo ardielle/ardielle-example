@@ -2,7 +2,7 @@
 
 ## An Example API
 
-The [RDL file](https://github.com/ardielle/ardielle-example/tree/master/rdl) defines a simple service that
+The [RDL file](https://github.com/ardielle/ardielle-example/tree/master/rdl/contacts.rdl) defines a simple service that
 manages Contacts. The types in the RDL are a basic Contact type that consistents of a well-formed string
 identifier and a set of string key/value pairs called attributes. 
 
@@ -11,6 +11,10 @@ actually enforce the authorization, but just logs what it could enforce. Authent
 certs signed by a common authority.
 
 ## Making a Go server
+
+The source for a Go language based server is [here](https://github.com/ardielle/ardielle-example/blob/master/go/contactsd/main.go).
+If you look at the [Makefile](https://github.com/ardielle/ardielle-example/blob/master/Makefile), you can see that it generates
+the model and server dispatch and related files into go/src/contacts, and builds against that.
 
     $ make
 
