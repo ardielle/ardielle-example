@@ -1,1 +1,7 @@
 *~
+keys/
+certs/
+go/bin
+go/pkg
+go/src
+

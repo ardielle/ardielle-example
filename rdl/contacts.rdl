@@ -1,0 +1,117 @@
+//
+// A simple API example in *RDL*
+//
+namespace example;
+name contacts;
+version 1;
+
+//
+// Identifier is a unique externally-assigned identifier for a single Contact
+//
+type Identifier String (pattern="[a-zA-Z_][a-zA-Z_0-9]*", maxsize=8);
+
+//
+// Attribute is an arbitrary labeled piece of information, i.e. email, messenger id, phone
+//
+type Attribute Struct {
+	String label; //the label for the attribute, i.e. "name" or "work email"
+	String value; //the value for the attribute, arbitrary format
+}
+
+//
+// Contact is a set of attribute assigned to a unique id
+//
+type Contact Struct {
+	Identifier id; //the identifier for the contact
+    Timestamp modified; //the last-modified-time of the contact
+	Array<Attribute> attributes (optional); //arbitrary attributes for the contact
+}
+
+//
+// ContactList is a list of contacts from a query, with an optional continuation value for pagination
+//
+type ContactList Struct {
+	Array<Contact> contacts; //the contacts
+	Int32 next (optional); //the value of the "start" parameter for the next call when there are more contacts
+}
+
+
+//
+// Add a new contact
+//
+resource Contact POST "/contacts" {
+    Contact contact; //The contact to create
+    String location (header="Location", out); //the URI to GET to fetch the created resource
+    authorize("CREATE", "contacts");
+    expected CREATED;
+    exceptions {
+        ResourceError BAD_REQUEST;
+        ResourceError CONFLICT;
+        ResourceError UNAUTHORIZED;
+        ResourceError FORBIDDEN;
+    }
+}
+
+//
+// Get a contact from the service, given a contactId.
+//
+resource Contact GET "/contacts/{contactId}?wait={timeout}" {
+    async; //a hint to the server implementation
+    Identifier contactId; //The id of a contact to fetch
+    Int32 timeout (default=0); //The time to wait until a revision changes from the provided revisedSince
+    String revisedSince (header="If-None-Match", optional); //specify to only return a newer revision
+    String revision (header="ETag", out); //the revision of the current response
+    expected OK, NOT_MODIFIED;
+    exceptions {
+        ResourceError BAD_REQUEST;
+        ResourceError NOT_FOUND;
+    }
+}
+
+//
+// Update an existing contact in the service
+//
+resource Contact PUT "/contacts/{contactId}" {
+    Identifier contactId; //The id of the contact to replace
+    Contact contact; //The new contact to completely replace the previous one
+    authorize("UPDATE", "contacts");
+    expected OK;
+    exceptions {
+        ResourceError BAD_REQUEST;
+        ResourceError NOT_FOUND;
+        ResourceError UNAUTHORIZED;
+        ResourceError FORBIDDEN;
+    }
+}
+
+
+
+//
+// Delete a contact
+//
+resource Contact DELETE "/contacts/{contactId}" {
+    Identifier contactId;
+    authorize("DELETE", "contacts");
+    expected NO_CONTENT;
+    exceptions {
+        ResourceError BAD_REQUEST;
+        ResourceError NOT_FOUND;
+        ResourceError UNAUTHORIZED;
+        ResourceError FORBIDDEN;
+    }
+}
+
+//
+// List contacts
+//
+resource ContactList GET "/contacts?start={start}&count={count}&label={label}&value={value}" {
+    Int32 start (default=0); //the starting offset of the results
+    Int32 count (optional); //if present, limit the number of results per call
+    String label (optional);
+    String value (optional);
+    exceptions {
+        ResourceError BAD_REQUEST;
+        ResourceError NOT_FOUND;
+    }
+}
+
