@@ -1,5 +1,15 @@
 # ardielle-example
 
+## An Example API
+
+The [RDL file](https://github.com/ardielle/ardielle-example/tree/master/rdl) defines a simple service that
+manages Contacts. The types in the RDL are a basic Contact type that consistents of a well-formed string
+identifier and a set of string key/value pairs called attributes. 
+
+Of note is that the PUT, POST, and DELETE operations on a Contact resource are protected. The example doesn't
+actually enforce the authorization, but just logs what it could enforce. Authentication is based on TLS client
+certs signed by a common authority.
+
 ## Making a Go server
 
     $ make
