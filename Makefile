@@ -41,3 +41,6 @@ src/contactsd/main.go:
 clean::
 	rm -rf go/bin go/pkg go/src keys certs go/contacts
 
+swagger::
+	echo point swagger at http://localhost:8080/contacts.json
+	$(RDL) -ps generate -o localhost:8080 swagger rdl/contacts.rdl
